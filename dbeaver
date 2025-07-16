@@ -1,0 +1,295 @@
+-- 🔹 테이블 삭제
+DROP TABLE comments CASCADE CONSTRAINTS;
+DROP TABLE paging CASCADE CONSTRAINTS;
+DROP TABLE board CASCADE CONSTRAINTS;
+DROP TABLE employee CASCADE CONSTRAINTS;
+
+-- 🔹 시퀀스 삭제
+DROP SEQUENCE seq_employee;
+DROP SEQUENCE seq_board;
+DROP SEQUENCE seq_comment;
+DROP SEQUENCE seq_paging_id;
+DROP SEQUENCE seq_paging_id2;
+
+-- BOARD 테이블 생성
+CREATE TABLE BOARD (
+    BNO        NUMBER          PRIMARY KEY,
+    TITLE     VARCHAR2(100)   NOT NULL,
+    WRITER    VARCHAR2(100)   NOT NULL,
+    CONTENT   CLOB,
+    REG_DATE  DATE            DEFAULT SYSDATE NOT NULL,
+    UPD_DATE  DATE            DEFAULT SYSDATE NOT NULL
+);
+
+-- BOARD 테이블의 NO 컬럼에 대한 시퀀스 생성
+CREATE SEQUENCE SEQ_BOARD
+INCREMENT BY 1
+START WITH 1
+MINVALUE 1
+MAXVALUE 10000 nocache;
+
+DROP SEQUENCE seq_employee;
+
+-- Employee 시퀀스 생성 (Oracle용)
+CREATE SEQUENCE SEQ_EMPLOYEE
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 10000
+NOCACHE;
+
+DELETE FROM employee;
+TRUNCATE TABLE employee;
+SELECT bno, user_id FROM employee ORDER BY bno;
+
+-- Employee 테이블 생성 (Oracle용)
+CREATE TABLE employee (
+    bno INT PRIMARY KEY,
+    name VARCHAR2(50) NOT NULL,
+    department VARCHAR2(50) NOT NULL,
+    bposition VARCHAR2(50) NOT NULL,
+    user_id VARCHAR2(50) NOT NULL,    -- 로그인 아이디 (고유값)
+    password VARCHAR2(100) NOT NULL,         -- 로그인 비밀번호
+    hire_date TIMESTAMP DEFAULT SYSTIMESTAMP,
+    upd_date TIMESTAMP DEFAULT SYSTIMESTAMP
+);
+
+DROP TABLE employee PURGE;
+
+-- 샘플 데이터 (아이디/비밀번호 포함)
+INSERT ALL
+    INTO employee (bno, name, department, bposition, user_id, password) VALUES (SEQ_EMPLOYEE.nextval, '김철수', '개발팀', '사원', 'kim', '123')
+    INTO employee (bno, name, department, bposition, user_id, password) VALUES (SEQ_EMPLOYEE.nextval, '이영희', '인사팀', '대리', 'lee', '123')
+    INTO employee (bno, name, department, bposition, user_id, password) VALUES (SEQ_EMPLOYEE.nextval, '박민수', '영업팀', '팀장', 'park', '123')
+    INTO employee (bno, name, department, bposition, user_id, password) VALUES (SEQ_EMPLOYEE.nextval, '정수진', '개발팀', '과장', 'jung', '123')
+    INTO employee (bno, name, department, bposition, user_id, password) VALUES (SEQ_EMPLOYEE.nextval, '최동욱', '마케팅팀', '사원', 'choi', '123')
+SELECT * FROM dual;
+
+
+-- 2. 샘플 데이터 추가 (DML)
+--    : 테이블과 시퀀스가 생성된 후, 아래 INSERT 문을 실행하여 초기 데이터를 추가합니다.
+--      프로그램 테스트를 위해 미리 데이터를 넣어두는 과정입니다.
+
+-- BOARD 샘플 데이터
+INSERT INTO board (bNO, TITLE, WRITER, CONTENT) VALUES(SEQ_BOARD.NEXTVAL, '제목01', '작성자01', '내용01');
+INSERT INTO board (bNO, TITLE, WRITER, CONTENT) VALUES(SEQ_BOARD.NEXTVAL, '제목02', '작성자02', '내용02');
+INSERT INTO board (bNO, TITLE, WRITER, CONTENT) VALUES(SEQ_BOARD.NEXTVAL, '제목03', '작성자03', '내용03');
+INSERT INTO board (bNO, TITLE, WRITER, CONTENT) VALUES(SEQ_BOARD.NEXTVAL, '제목04', '작성자04', '내용04');
+INSERT INTO board (bNO, TITLE, WRITER, CONTENT) VALUES(SEQ_BOARD.NEXTVAL, '제목05', '작성자05', '내용05');
+
+SELECT seq_employee.nextval FROM dual;
+DROP SEQUENCE seq_employee;
+
+-- EMPLOYEE 샘플 데이터
+INSERT INTO employee (bNO, NAME, DEPARTMENT, bPOSITION, HIRE_DATE) VALUES(SEQ_EMPLOYEE.NEXTVAL, '홍씨', '개발팀', '과장', TO_DATE('2020-01-15', 'YYYY-MM-DD'));
+INSERT INTO employee (bNO, NAME, DEPARTMENT, bPOSITION, HIRE_DATE) VALUES(SEQ_EMPLOYEE.NEXTVAL, '김씨', '디자인팀', '대리', TO_DATE('2021-03-20', 'YYYY-MM-DD'));
+INSERT INTO employee (bNO, NAME, DEPARTMENT, bPOSITION, HIRE_DATE) VALUES(SEQ_EMPLOYEE.NEXTVAL, '박씨', '인사팀', '사원', TO_DATE('2022-07-10', 'YYYY-MM-DD'));
+INSERT INTO employee (bNO, NAME, DEPARTMENT, bPOSITION, HIRE_DATE) VALUES(SEQ_EMPLOYEE.NEXTVAL, '최씨', '마케팅팀', '팀장', TO_DATE('2019-11-05', 'YYYY-MM-DD'));
+INSERT INTO employee (bNO, NAME, DEPARTMENT, bPOSITION, HIRE_DATE) VALUES(SEQ_EMPLOYEE.NEXTVAL, '정씨', '경영지원팀', '부장', TO_DATE('2018-05-12', 'YYYY-MM-DD'));
+
+-- 기존 댓글 테이블과 시퀀스 삭제 (있다면)
+-- TABLE comments CASCADE CONSTRAINTS;
+--DROP SEQUENCE SEQ_COMMENT;
+
+-- COMMENT 테이블의 NO 컬럼에 대한 시퀀스 생성
+CREATE SEQUENCE SEQ_COMMENT
+INCREMENT BY 1
+START WITH 1
+MINVALUE 1
+MAXVALUE 10000;
+
+-- COMMENTS 테이블 생성
+CREATE TABLE comments (
+    bno NUMBER PRIMARY KEY,
+    board_no NUMBER NOT NULL,
+    writer VARCHAR2(100) NOT NULL,
+    content CLOB,
+    reg_date DATE DEFAULT SYSDATE NOT NULL,
+    upd_date DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT fk_comments_board FOREIGN KEY (board_no) REFERENCES board(bno) ON DELETE CASCADE
+);
+
+-- 샘플 댓글 데이터 추가
+INSERT INTO comments (bNO, BOARD_NO, WRITER, CONTENT) VALUES(SEQ_COMMENT.NEXTVAL, 1, '댓글작성자1', '첫 번째 게시글에 대한 댓글입니다.');
+INSERT INTO comments (bNO, BOARD_NO, WRITER, CONTENT) VALUES(SEQ_COMMENT.NEXTVAL, 1, '댓글작성자2', '좋은 글이네요!');
+INSERT INTO comments (bNO, BOARD_NO, WRITER, CONTENT) VALUES(SEQ_COMMENT.NEXTVAL, 2, '댓글작성자3', '두 번째 게시글 댓글입니다.');
+INSERT INTO comments (bNO, BOARD_NO, WRITER, CONTENT) VALUES(SEQ_COMMENT.NEXTVAL, 3, '댓글작성자4', '세 번째 게시글에 대한 의견입니다.');
+
+-- 기존 테이블이 있다면 삭제
+DROP TABLE paging CASCADE CONSTRAINTS;
+
+-- 페이징 테이블 생성
+CREATE TABLE paging (
+    paging_id NUMBER PRIMARY KEY,           -- 페이징 정보 ID (시퀀스 사용)
+    total_count NUMBER NOT NULL,            -- 전체 게시글 수
+    count_list NUMBER NOT NULL,             -- 한 페이지당 게시글 수
+    page_num NUMBER NOT NULL,               -- 현재 페이지 번호
+    total_page NUMBER NOT NULL,             -- 전체 페이지 수
+    start_page NUMBER NOT NULL,             -- 시작 페이지 번호
+    end_page NUMBER NOT NULL,               -- 끝 페이지 번호
+    start_row NUMBER NOT NULL,              -- 시작 행 번호 (DB 쿼리용)
+    end_row NUMBER NOT NULL,                -- 끝 행 번호 (DB 쿼리용)
+    has_next NUMBER(1) DEFAULT 0 NOT NULL,  -- 다음 페이지 존재 여부 (0: false, 1: true)
+    has_prev NUMBER(1) DEFAULT 0 NOT NULL,  -- 이전 페이지 존재 여부 (0: false, 1: true)
+    
+    -- 검색 관련 컬럼들
+    search_type VARCHAR2(20),               -- 검색 타입 (title, writer, content, all)
+    search_keyword VARCHAR2(200),           -- 검색 키워드
+    
+    -- 메타 정보
+    created_date DATE DEFAULT SYSDATE,      -- 생성일
+    updated_date DATE DEFAULT SYSDATE,      -- 수정일
+    
+    -- 제약조건
+    CONSTRAINT chk_paging_count_list CHECK (count_list > 0),
+    CONSTRAINT chk_paging_page_num CHECK (page_num > 0),
+    CONSTRAINT chk_paging_total_page CHECK (total_page >= 0),
+    CONSTRAINT chk_paging_has_next CHECK (has_next IN (0, 1)),
+    CONSTRAINT chk_paging_has_prev CHECK (has_prev IN (0, 1))
+);
+
+-- 시퀀스 생성
+CREATE SEQUENCE seq_paging_id2
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- 인덱스 생성
+CREATE INDEX idx_paging_page_num ON paging(page_num);
+CREATE INDEX idx_paging_search ON paging(search_type, search_keyword);
+CREATE INDEX idx_paging_created_date ON paging(created_date);
+
+-- 테이블 코멘트
+COMMENT ON TABLE paging IS '페이징 정보를 저장하는 테이블';
+COMMENT ON COLUMN paging.paging_id IS '페이징 정보 ID (기본키)';
+COMMENT ON COLUMN paging.total_count IS '전체 게시글 수';
+COMMENT ON COLUMN paging.count_list IS '한 페이지당 게시글 수';
+COMMENT ON COLUMN paging.page_num IS '현재 페이지 번호';
+COMMENT ON COLUMN paging.total_page IS '전체 페이지 수';
+COMMENT ON COLUMN paging.start_page IS '시작 페이지 번호';
+COMMENT ON COLUMN paging.end_page IS '끝 페이지 번호';
+COMMENT ON COLUMN paging.start_row IS '시작 행 번호 (DB 쿼리용)';
+COMMENT ON COLUMN paging.end_row IS '끝 행 번호 (DB 쿼리용)';
+COMMENT ON COLUMN paging.has_next IS '다음 페이지 존재 여부 (0: false, 1: true)';
+COMMENT ON COLUMN paging.has_prev IS '이전 페이지 존재 여부 (0: false, 1: true)';
+COMMENT ON COLUMN paging.search_type IS '검색 타입 (title, writer, content, all)';
+COMMENT ON COLUMN paging.search_keyword IS '검색 키워드';
+COMMENT ON COLUMN paging.created_date IS '생성일';
+COMMENT ON COLUMN paging.updated_date IS '수정일';
+
+-- =====================================================
+-- 페이징 정보 삽입 예시
+-- =====================================================
+
+-- 1. 기본 페이징 정보 (전체 게시글 100개, 페이지당 10개, 1페이지)
+INSERT INTO paging (
+    paging_id, total_count, count_list, page_num, total_page,
+    start_page, end_page, start_row, end_row, has_next, has_prev
+) VALUES (
+    seq_paging_id.NEXTVAL, 100, 10, 1, 10,
+    1, 10, 1, 10, 1, 0
+);
+
+-- 2. 검색 페이징 정보 (제목 검색, 검색 결과 25개, 페이지당 5개, 1페이지)
+INSERT INTO paging (
+    paging_id, total_count, count_list, page_num, total_page,
+    start_page, end_page, start_row, end_row, has_next, has_prev,
+    search_type, search_keyword
+) VALUES (
+    seq_paging_id.NEXTVAL, 25, 5, 1, 5,
+    1, 5, 1, 5, 1, 0,
+    'title', '테스트'
+);
+
+-- =====================================================
+-- 페이징 정보 조회 쿼리 예시
+-- =====================================================
+
+-- 1. 모든 페이징 정보 조회
+SELECT * FROM paging ORDER BY created_date DESC;
+
+-- 2. 특정 페이징 정보 조회
+SELECT * FROM paging WHERE paging_id = 1;
+
+-- 3. 검색 조건별 페이징 정보 조회
+SELECT * FROM paging 
+WHERE search_type = 'title' 
+AND search_keyword = '테스트'
+ORDER BY created_date DESC;
+
+-- 4. 최근 페이징 정보 조회 (최근 10개)
+SELECT * FROM paging 
+ORDER BY created_date DESC 
+FETCH FIRST 10 ROWS ONLY;
+
+-- =====================================================
+-- 페이징 정보 업데이트 예시
+-- =====================================================
+
+-- 페이징 정보 업데이트
+UPDATE paging 
+SET total_count = 150,
+    total_page = 15,
+    end_page = 10,
+    end_row = 10,
+    has_next = 1,
+    updated_date = SYSDATE
+WHERE paging_id = 1;
+
+-- =====================================================
+-- 페이징 정보 삭제 예시
+-- =====================================================
+
+-- 특정 페이징 정보 삭제
+DELETE FROM paging WHERE paging_id = 1;
+
+-- 오래된 페이징 정보 삭제 (30일 이전)
+DELETE FROM paging 
+WHERE created_date < SYSDATE - 30; 
+
+
+-- 3. 데이터 조작 및 조회 예시 (선택 사항)
+--    : 아래는 DAO 클래스의 메소드들이 정상적으로 동작하는지 테스트해볼 수 있는 예시 SQL문입니다.
+--      필요에 따라 실행하여 데이터를 확인하거나 수정/삭제할 수 있습니다.
+
+
+DELETE FROM employee;
+
+-- BOARD 전체 조회
+SELECT * FROM board;
+
+-- BOARD 선택 조회 (1번 게시글)
+SELECT * FROM board WHERE no = 1;
+
+-- BOARD 데이터 수정 (1번 게시글)
+UPDATE board SET title = '수정된 제목', writer = '수정한 작성자', content = '수정된 내용', upd_date = SYSDATE WHERE no = 1;
+
+-- BOARD 데이터 삭제 (1번 게시글)
+DELETE FROM board WHERE no = 1;
+
+-- EMPLOYEE 전체 조회
+SELECT * FROM employee;
+
+-- EMPLOYEE 선택 조회 (1번 직원)
+SELECT * FROM employee WHERE no = 1;
+
+-- EMPLOYEE 데이터 수정 (1번 직원)
+UPDATE employee SET name = '수정된 이름', department = '수정된 부서', position = '수정된 직급', upd_date = SYSDATE WHERE no = 1;
+
+-- EMPLOYEE 데이터 삭제 (1번 직원)
+DELETE FROM employee WHERE no = 1;
+
+-- 댓글 테이블 확인
+SELECT * FROM comments;
+
+-- 게시글과 댓글 조인 조회 예시
+SELECT b.no as board_no, b.title, b.writer as board_writer, 
+       c.no as comment_no, c.writer as comment_writer, c.content as comment_content
+FROM board b
+LEFT JOIN comments c ON b.no = c.board_no
+ORDER BY b.no, c.reg_date;
+
+-- 4. 변경사항 최종 저장 (TCL)
+--    : 모든 DML(INSERT, UPDATE, DELETE) 작업이 완료된 후, COMMIT을 실행하여 변경사항을 데이터베이스에 영구적으로 저장합니다.
+COMMIT;
