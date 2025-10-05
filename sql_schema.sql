@@ -39,15 +39,13 @@ CREATE TABLE employee (
   hire_date DATE DEFAULT SYSDATE,    -- 입사일자
   upd_date DATE DEFAULT SYSDATE      -- 정보 수정일자
 );
-<<<<<<< HEAD
-=======
+
  
 -- 관리자 정보 생성
  INSERT INTO employee (bno, name, department, bposition, user_id, password, hire_date)
  VALUES (SEQ_EMPLOYEE.NEXTVAL, '관리자', '관리부서', '관리자', 'admin', '1234',
  SYSDATE);
  COMMIT;
->>>>>>> f47e3ab (학사일정 기능 추가)
 
 -- 게시글 테이블
 CREATE TABLE board (
@@ -76,8 +74,7 @@ CREATE TABLE likes (
   PRIMARY KEY (board_no, emp_no)       -- 복합 기본 키 (한 사람이 한 게시글에 한 번만 좋아요 가능)
 );
 
-<<<<<<< HEAD
-=======
+
 CREATE TABLE academic_schedule (
 schedule_id NUMBER PRIMARY KEY,
 title VARCHAR2(200) NOT NULL,
@@ -91,15 +88,12 @@ description CLOB
  '2025-08-31', 'YYYY-MM-DD'), '여름방학 기간입니다.');
 
 
->>>>>>> f47e3ab (학사일정 기능 추가)
 -- 시퀀스 생성
 CREATE SEQUENCE SEQ_BOARD START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE SEQ_COMMENT START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE SEQ_EMPLOYEE START WITH 1 INCREMENT BY 1;
-<<<<<<< HEAD
-=======
 CREATE SEQUENCE SEQ_ACADEMIC_SCHEDULE START WITH 1 INCREMENT BY 1;
->>>>>>> f47e3ab (학사일정 기능 추가)
+
 
 -- 외래 키(Foreign Key) 제약조건 추가
 ALTER TABLE comments ADD CONSTRAINT fk_comments_board
